@@ -9,6 +9,9 @@ authors = [
   "Roman Hodulák <roman.hodulak@cartesi.io>",
 ]
 
+[registries]
+cartesi = { index = "https://github.com/cartesi/crates-index" }
+
 [dependencies]
 state-fold-types = { version = "0.6", registry = "cartesi", features = ["ethers"] }
 

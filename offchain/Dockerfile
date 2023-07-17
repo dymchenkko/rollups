@@ -27,11 +27,11 @@ RUN cargo chef prepare --recipe-path recipe.json
 
 # cargo chef cook stage
 FROM chef AS builder
+ARG DEBIAN_FRONTEND=noninteractive
+ENV DEBIAN_FRONTEND=${DEBIAN_FRONTEND}
 
-RUN <<EOF
-DEBIAN_FRONTEND="noninteractive" apt-get update
-DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-install-recommends cmake libprotobuf-dev protobuf-compiler
-EOF
+RUN apt-get update 
+RUN apt-get install -y --no-install-recommends cmake libprotobuf-dev protobuf-compiler
 
 WORKDIR /usr/src/app/offchain
 COPY --from=planner /usr/src/app/offchain/recipe.json recipe.json
@@ -73,43 +73,35 @@ ENV PATH="/opt/cartesi/bin:${PATH}"
 
 ## runtimes
 FROM runtime AS state_server
-RUN <<EOF
-apt-get update
-DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-install-recommends ca-certificates
-rm -rf /var/lib/apt/lists/*
-EOF
+RUN apt-get update 
+RUN apt-get install -y --no-install-recommends ca-certificates 
+RUN rm -rf /var/lib/apt/lists/*
 COPY --from=grpc_health_probe /go/bin/grpc-health-probe /usr/local/bin
 COPY --from=state_server_build /usr/src/app/offchain/target/release/rollups_state_server /opt/cartesi/bin/rollups_state_server
 USER cartesi
 ENTRYPOINT ["/opt/cartesi/bin/rollups_state_server"]
 
 FROM runtime AS indexer
-RUN <<EOF
-apt-get update
-DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-install-recommends libpq5 ca-certificates
-rm -rf /var/lib/apt/lists/*
-EOF
+RUN apt-get update 
+RUN apt-get install -y --no-install-recommends libpq5 ca-certificates 
+RUN rm -rf /var/lib/apt/lists/*
 COPY --from=indexer_build /usr/src/app/offchain/target/release/indexer /opt/cartesi/bin/indexer
 USER cartesi
 ENTRYPOINT ["/opt/cartesi/bin/indexer"]
 
 FROM runtime AS dispatcher
-RUN <<EOF
-apt-get update
-DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-install-recommends ca-certificates
-rm -rf /var/lib/apt/lists/*
-EOF
+RUN apt-get update 
+RUN apt-get install -y --no-install-recommends ca-certificates 
+RUN rm -rf /var/lib/apt/lists/*
 COPY --from=dispatcher_build /usr/src/app/offchain/target/release/rollups_dispatcher /opt/cartesi/bin/rollups_dispatcher
 COPY onchain/rollups/export/abi /opt/cartesi/share/deployments/
 USER cartesi
 ENTRYPOINT ["/opt/cartesi/bin/rollups_dispatcher"]
 
 FROM runtime AS advance_runner
-RUN <<EOF
-apt-get update
-DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-install-recommends ca-certificates curl
-rm -rf /var/lib/apt/lists/*
-EOF
+RUN apt-get update 
+RUN apt-get install -y --no-install-recommends ca-certificates curl 
+RUN rm -rf /var/lib/apt/lists/*
 COPY --from=advance_runner_build /usr/src/app/offchain/target/release/advance-runner /opt/cartesi/bin/advance-runner
 USER cartesi
 ENTRYPOINT ["/opt/cartesi/bin/advance-runner"]
@@ -120,11 +112,9 @@ USER cartesi
 ENTRYPOINT ["/opt/cartesi/bin/inspect-server"]
 
 FROM runtime AS graphql_server
-RUN <<EOF
-apt-get update
-DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-install-recommends libpq5
-rm -rf /var/lib/apt/lists/*
-EOF
+RUN apt-get update 
+RUN apt-get install -y --no-install-recommends libpq5 
+RUN rm -rf /var/lib/apt/lists/*
 COPY --from=graphql_server_build /usr/src/app/offchain/target/release/graphql-server /opt/cartesi/bin/graphql-server
 USER cartesi
 ENTRYPOINT ["/opt/cartesi/bin/graphql-server"]

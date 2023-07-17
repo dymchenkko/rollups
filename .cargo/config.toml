@@ -1,0 +1,2 @@
+[registries]
+cartesi = { index = "https://github.com/cartesi/crates-index" }

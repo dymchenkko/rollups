@@ -19,3 +19,6 @@ lcov.info
 
 # Test
 test/uarch-log
+
+Cargo.lock
+target/

@@ -15,3 +15,6 @@ members = [
   "test-fixtures",
   "types",
 ]
+
+[registries]
+cartesi = { index = "https://github.com/cartesi/crates-index" }

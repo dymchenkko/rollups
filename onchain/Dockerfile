@@ -17,11 +17,8 @@ FROM node:16.17.0-alpine3.15 as base
 FROM base as builder
 
 # install git and python3
-RUN <<EOF
-apk update
-apk add --no-cache g++ git make python3
-rm -rf /var/cache/apk/*
-EOF
+RUN apk update && apk add --no-cache git make g++ python3
+RUN rm -rf /var/cache/apk/*
 
 WORKDIR /app
 
